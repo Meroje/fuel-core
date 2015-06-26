@@ -1,0 +1,7 @@
+{
+  "name": "fuel/core",
+  "require": {
+    "composer/installers": "~1.0"
+  },
+  "type": "fuel-package"
+}

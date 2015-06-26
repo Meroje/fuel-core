@@ -1,6 +1,8 @@
 {
   "name": "novius-os/fuelphp-core",
-  "replace": [ "fuel/core" ],
+  "replace": {
+    "fuel/core": "self.version"
+  },
   "require": {
     "composer/installers": "~1.0"
   },

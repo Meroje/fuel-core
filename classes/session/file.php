@@ -44,7 +44,7 @@ class Session_File extends \Session_Driver
 	 * create a new session
 	 *
 	 * @access	public
-	 * @return	Fuel\Core\Session_File
+	 * @return	\Fuel\Core\Session_File
 	 */
 	public function create()
 	{
@@ -307,9 +307,11 @@ class Session_File extends \Session_Driver
 	/**
 	 * validate a driver config value
 	 *
-	 * @param	array	array with configuration values
-	 * @access	public
-	 * @return  array	validated and consolidated config
+	 * @param $config
+	 * @return array validated and consolidated config
+	 * @throws \FuelException
+	 * @internal param array $array with configuration values
+	 * @access    public
 	 */
 	public function _validate_config($config)
 	{

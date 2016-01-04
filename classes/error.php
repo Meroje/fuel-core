@@ -32,7 +32,7 @@ class PhpErrorException extends \ErrorException
 			if (\Fuel::$env != \Fuel::PRODUCTION and ($this->code & error_reporting()) == $this->code)
 			{
 				static::$count++;
-				\Error::show_php_error(new \ErrorException($this->message, $this->code, 0, $this->file, $this->line));
+				\ApplicationError::show_php_error(new \ErrorException($this->message, $this->code, 0, $this->file, $this->line));
 			}
 		}
 		elseif (\Fuel::$env != \Fuel::PRODUCTION
@@ -40,7 +40,7 @@ class PhpErrorException extends \ErrorException
 				and ($this->severity & error_reporting()) == $this->severity)
 		{
 			static::$count++;
-			\Error::notice('Error throttling threshold was reached, no more full error reports are shown.', true);
+			\ApplicationError::notice('Error throttling threshold was reached, no more full error reports are shown.', true);
 		}
 	}
 }
@@ -48,7 +48,7 @@ class PhpErrorException extends \ErrorException
 /**
  *
  */
-class Error
+class ApplicationError
 {
 
 	public static $levels = array(
@@ -106,10 +106,10 @@ class Error
 	/**
 	 * PHP Exception handler
 	 *
-	 * @param   Exception  $e  the exception
+	 * @param   \Throwable  $e  the exception
 	 * @return  bool
 	 */
-	public static function exception_handler(\Exception $e)
+	public static function exception_handler(\Throwable $e)
 	{
 		if (method_exists($e, 'handle'))
 		{
@@ -132,11 +132,12 @@ class Error
 	/**
 	 * PHP Error handler
 	 *
-	 * @param   int     $severity  the severity code
-	 * @param   string  $message   the error message
-	 * @param   string  $filepath  the path to the file throwing the error
-	 * @param   int     $line      the line number of the error
-	 * @return  bool    whether to continue with execution
+	 * @param   int $severity the severity code
+	 * @param   string $message the error message
+	 * @param   string $filepath the path to the file throwing the error
+	 * @param   int $line the line number of the error
+	 * @return bool whether to continue with execution
+	 * @throws \PhpErrorException
 	 */
 	public static function error_handler($severity, $message, $filepath, $line)
 	{
@@ -164,10 +165,10 @@ class Error
 	 * Shows an error.  It will stop script execution if the error code is not
 	 * in the errors.continue_on whitelist.
 	 *
-	 * @param   Exception  $e  the exception to show
+	 * @param   \Throwable  $e  the exception to show
 	 * @return  void
 	 */
-	public static function show_php_error(\Exception $e)
+	public static function show_php_error(\Throwable $e)
 	{
 		$fatal = (bool)( ! in_array($e->getCode(), \Config::get('errors.continue_on', array())));
 		$data = static::prepare_exception($e, $fatal);
@@ -253,14 +254,14 @@ class Error
 	 * Shows the errors/production view and exits.  This only gets
 	 * called when an error occurs in production mode.
 	 *
-	 * @return  void
+	 * @param \Throwable $e
 	 */
-	public static function show_production_error(\Exception $e)
+	public static function show_production_error(\Throwable $e)
 	{
 		// when we're on CLI, always show the php error
 		if (\Fuel::$is_cli)
 		{
-			return static::show_php_error($e);
+			static::show_php_error($e);
 		}
 
 		if ( ! headers_sent())
@@ -271,7 +272,7 @@ class Error
 		exit(\View::forge('errors'.DS.'production'));
 	}
 
-	protected static function prepare_exception(\Exception $e, $fatal = true)
+	protected static function prepare_exception(\Throwable $e, $fatal = true)
 	{
 		$data = array();
 		$data['type']		= get_class($e);

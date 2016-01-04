@@ -291,7 +291,7 @@ abstract class ViewModel
 		}
 		catch (\Exception $e)
 		{
-			\Error::exception_handler($e);
+			\ApplicationError::exception_handler($e);
 
 			return '';
 		}
